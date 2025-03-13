@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Resume Expert</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 600;
+        }
+
+        .container {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .file-upload {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed #cbd5e0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #3498db;
+            background: #f0f7ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            cursor: pointer;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-tertiary {
+            background: #9b59b6;
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #3498db;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .button-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>ATS Resume Expert</h1>
+        
+        <div class="container">
+            <label for="job-description">Job Description:</label>
+            <textarea id="job-description" placeholder="Paste the job description here..."></textarea>
+        </div>
+
+        <div class="container">
+            <div class="file-upload">
+                <input type="file" id="resume" accept=".pdf">
+                <label for="resume" class="file-label">
+                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Click to upload your resume (PDF)</p>
+                </label>
+                <div id="file-name" class="file-name"></div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button onclick="analyzeResume('tell_about_resume')" class="btn-primary">
+                Tell Me About the Resume
+            </button>
+            <button onclick="analyzeResume('improve_skills')" class="btn-secondary">
+                How Can I Improve my Skills
+            </button>
+            <button onclick="analyzeResume('percentage_match')" class="btn-tertiary">
+                Percentage Match
+            </button>
+        </div>
+
+        <div id="response" class="response"></div>
+    </div>
+
+    <script>
+        // Show selected filename
+        document.getElementById('resume').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || 'No file selected';
+            document.getElementById('file-name').textContent = fileName;
+        });
+
+        async function analyzeResume(actionType) {
+            const resumeFile = document.getElementById('resume').files[0];
+            const jobDescription = document.getElementById('job-description').value;
+            const responseDiv = document.getElementById('response');
+
+            if (!resumeFile) {
+                alert('Please upload a resume');
+                return;
+            }
+
+            if (!jobDescription) {
+                alert('Please enter a job description');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', resumeFile);
+            formData.append('job_description', jobDescription);
+            formData.append('action_type', actionType);
+
+            try {
+                responseDiv.innerHTML = '<div class="loading">Analyzing your resume</div>';
+                responseDiv.style.display = 'block';
+
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    responseDiv.innerHTML = `<div style="color: #e74c3c">Error: ${data.error}</div>`;
+                } else {
+                    responseDiv.innerHTML = data.response;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = `<div style="color: #e74c3c">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html> 
